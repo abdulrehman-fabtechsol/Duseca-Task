@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  project:
+    build: .
+    container_name: "project"
+    command: bash -c "python manage.py runserver 0.0.0.0:80"
+    volumes:
+      - ./:/usr/src/app/
+    ports:
+      - "80:80"
+    env_file:
+      - .env
