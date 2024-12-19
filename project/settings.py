@@ -75,6 +75,8 @@ INSTALLED_APPS += [
     "rest_framework.authtoken",
     'storages',
     "crispy_forms",
+    "corsheaders",
+    # "social_django"
 ]
 
 REST_FRAMEWORK = {
@@ -84,7 +86,7 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.TokenAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        # "rest_framework.permissions.IsAuthenticated",
+        "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
@@ -93,8 +95,8 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "EZPZLS",
-    "DESCRIPTION": "EZPZLS API",
+    "TITLE": "Boogeat",
+    "DESCRIPTION": "Boogeat API",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
@@ -109,7 +111,11 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
+    # 'social_django.middleware.SocialAuthExceptionMiddleware'
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = "project.urls"
 
@@ -145,13 +151,14 @@ DATABASES = {
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': os.environ.get('PR_DB_NAME'),
-#         'USER': os.environ.get('PR_DB_USER'),
-#         'PASSWORD': os.environ.get('PR_DB_PASSWORD'),
-#         'HOST': os.environ.get('PR_DB_HOST'),
+#         'NAME': os.environ.get('NAME'),
+#         'USER': os.environ.get('USERdb'),
+#         'PASSWORD': os.environ.get('PASSWORD'),
+#         'HOST': os.environ.get('HOST'),
 #         'PORT': '5432',
 #     }
 # }
+
 
 
 # Password validation
@@ -190,31 +197,26 @@ USE_TZ = True
 
 s3 = True if os.environ.get("DEBUG") == "False" else False
 if s3:
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
     AWS_S3_FILE_OVERWRITE = False
-    # AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
-    # AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
     AWS_S3_SIGNATURE_VERSION = "s3v4"
     AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
-    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400",'ACL': 'private',}
-    BUCKET_URL = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
-    AWS_S3_CUSTOM_DOMAIN = None 
-    # Set the expiration time for signed URLs (e.g., 3600 seconds = 1 hour)
-    # AWS_QUERYSTRING_AUTH = True
-    AWS_QUERYSTRING_EXPIRE = 3600  # 1 hour expiration
-    AWS_S3_REGION_NAME = 'us-east-2'
+    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+    AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
     # s3 static settings
     STATIC_LOCATION = "static"
-    STATIC_URL = f"https://{BUCKET_URL}/{STATIC_LOCATION}/"
+    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/"
     STATICFILES_STORAGE = "project.storage_backends.StaticStorage"
-
     # s3 public media settings
     PUBLIC_MEDIA_LOCATION = "media"
-    MEDIA_URL = f"https://{BUCKET_URL}/{PUBLIC_MEDIA_LOCATION}/"
-    DEFAULT_FILE_STORAGE = "project.storage_backends.MediaStorage"
-
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/"
+    DEFAULT_FILE_STORAGE = "project.storage_backends.PublicMediaStorage"
     # s3 private media settings
     PRIVATE_MEDIA_LOCATION = "private"
-    PRIVATE_FILE_STORAGE = "project.storage_backends.PrivateStorage"
+    PRIVATE_FILE_STORAGE = "project.storage_backends.PrivateMediaStorage"
 else:
     STATIC_URL = "/static/"
     STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
@@ -229,7 +231,64 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_USE_TLS = True
-EMAIL_PORT = os.environ.get("EMAIL_PORT")  # for SSL port 465
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = 587 
+EMAIL_HOST_USER = "fabtestac9@gmail.com"
+EMAIL_HOST_PASSWORD = "cehhyifjaehrkmmv"
 
+MESSAGE_TAGS = {
+    messages.DEBUG: "alert-secondary",
+    messages.INFO: "alert-info",
+    messages.SUCCESS: "alert-success",
+    messages.WARNING: "alert-warning",
+    messages.ERROR: "alert-danger",
+}
+
+
+# AUTHENTICATION_BACKENDS = [
+#     'django.contrib.auth.backends.ModelBackend',
+#     'social_core.backends.google.GoogleOAuth2',
+#     'social_core.backends.facebook.FacebookOAuth2',
+# ]
+
+# # Facebook Authentication
+# SOCIAL_AUTH_FACEBOOK_KEY = os.environ.get("SOCIAL_AUTH_FACEBOOK_KEY")  # Your Facebook App ID
+# SOCIAL_AUTH_FACEBOOK_SECRET = os.environ.get("SOCIAL_AUTH_FACEBOOK_SECRET")  # Your Facebook App Secret
+
+# SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']  # Permissions requested
+# SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+#     'fields': 'id,name,email'  # Specify the fields to retrieve
+# }
+# SOCIAL_AUTH_FACEBOOK_EXTRA_DATA = [
+#     ('name', 'name'),
+#     ('email', 'email'),
+#     ('picture', 'picture'),
+#     ('link', 'profile_url'),
+# ]
+
+# # Google Authentication
+# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")  # Your Google Client ID
+# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")  # Your Google Client Secret
+
+# SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+#     'email',
+#     'profile',
+# ]  # Specify the scopes (permissions) required
+
+# SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = []  # Add allowed domains (if needed)
+# SOCIAL_AUTH_GOOGLE_OAUTH2_USE_DEPRECATED_API = True  # Use deprecated API if required
+
+# SOCIAL_AUTH_PIPELINE = (
+#     'social_core.pipeline.social_auth.social_details',
+#     'social_core.pipeline.social_auth.social_uid',
+#     'social_core.pipeline.social_auth.auth_allowed',
+#     'social_core.pipeline.social_auth.social_user',
+#     'social_core.pipeline.user.get_username',
+#     "app.pipeline.create_user",  # Replace 'app' with your app's name containing pipeline
+#     'social_core.pipeline.social_auth.associate_by_email',
+#     'social_core.pipeline.social_auth.associate_user',
+#     'social_core.pipeline.social_auth.load_extra_data',
+#     'social_core.pipeline.user.user_details',
+#     'app.pipeline.redirect_based_on_role',  # Replace 'app' with your app's name containing pipeline
+# )
+
+# SOCIAL_AUTH_REDIRECT_IS_HTTPS = False  # Set to True if using HTTPS
