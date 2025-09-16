@@ -141,25 +141,34 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    },
-}
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': os.environ.get('NAME'),
-#         'USER': os.environ.get('USERdb'),
-#         'PASSWORD': os.environ.get('PASSWORD'),
-#         'HOST': os.environ.get('HOST'),
-#         'PORT': '5432',
-#     }
-# }
 
 
+IN_DOCKER = os.environ.get("DB_HOST") == "db"
+
+if IN_DOCKER:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.environ.get('DB_NAME'),
+            'USER': os.environ.get('DB_USER'),
+            'PASSWORD': os.environ.get('DB_PASSWORD'),
+            'HOST': os.environ.get('DB_HOST'),
+            'PORT': os.environ.get('DB_PORT', '5432'),
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.environ.get('LOCAL_DB_NAME'),
+            'USER': os.environ.get('LOCAL_DB_USER'),
+            'PASSWORD': os.environ.get('LOCAL_DB_PASSWORD'),
+            'HOST': os.environ.get('LOCAL_DB_HOST'),
+            'PORT': os.environ.get('LOCAL_DB_PORT', '5432'),
+        }
+    }
+
+print(DATABASES)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -235,60 +244,6 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = "fabtestac9@gmail.com"
 EMAIL_HOST_PASSWORD = "cehhyifjaehrkmmv"
 
-MESSAGE_TAGS = {
-    messages.DEBUG: "alert-secondary",
-    messages.INFO: "alert-info",
-    messages.SUCCESS: "alert-success",
-    messages.WARNING: "alert-warning",
-    messages.ERROR: "alert-danger",
-}
 
 
-# AUTHENTICATION_BACKENDS = [
-#     'django.contrib.auth.backends.ModelBackend',
-#     'social_core.backends.google.GoogleOAuth2',
-#     'social_core.backends.facebook.FacebookOAuth2',
-# ]
 
-# # Facebook Authentication
-# SOCIAL_AUTH_FACEBOOK_KEY = os.environ.get("SOCIAL_AUTH_FACEBOOK_KEY")  # Your Facebook App ID
-# SOCIAL_AUTH_FACEBOOK_SECRET = os.environ.get("SOCIAL_AUTH_FACEBOOK_SECRET")  # Your Facebook App Secret
-
-# SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']  # Permissions requested
-# SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
-#     'fields': 'id,name,email'  # Specify the fields to retrieve
-# }
-# SOCIAL_AUTH_FACEBOOK_EXTRA_DATA = [
-#     ('name', 'name'),
-#     ('email', 'email'),
-#     ('picture', 'picture'),
-#     ('link', 'profile_url'),
-# ]
-
-# # Google Authentication
-# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")  # Your Google Client ID
-# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")  # Your Google Client Secret
-
-# SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
-#     'email',
-#     'profile',
-# ]  # Specify the scopes (permissions) required
-
-# SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = []  # Add allowed domains (if needed)
-# SOCIAL_AUTH_GOOGLE_OAUTH2_USE_DEPRECATED_API = True  # Use deprecated API if required
-
-# SOCIAL_AUTH_PIPELINE = (
-#     'social_core.pipeline.social_auth.social_details',
-#     'social_core.pipeline.social_auth.social_uid',
-#     'social_core.pipeline.social_auth.auth_allowed',
-#     'social_core.pipeline.social_auth.social_user',
-#     'social_core.pipeline.user.get_username',
-#     "app.pipeline.create_user",  # Replace 'app' with your app's name containing pipeline
-#     'social_core.pipeline.social_auth.associate_by_email',
-#     'social_core.pipeline.social_auth.associate_user',
-#     'social_core.pipeline.social_auth.load_extra_data',
-#     'social_core.pipeline.user.user_details',
-#     'app.pipeline.redirect_based_on_role',  # Replace 'app' with your app's name containing pipeline
-# )
-
-# SOCIAL_AUTH_REDIRECT_IS_HTTPS = False  # Set to True if using HTTPS
