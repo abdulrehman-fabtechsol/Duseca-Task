@@ -34,7 +34,7 @@ class Review(models.Model):
     rating = models.PositiveSmallIntegerField(choices=RATING_CHOICES)
 
     class Meta:
-        unique_together = ('book_id', 'user_id')
+        unique_together = ('book', 'user')
         constraints = [
             models.CheckConstraint(
                 check=models.Q(rating__gte=1, rating__lte=5),

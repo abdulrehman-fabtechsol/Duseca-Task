@@ -5,17 +5,12 @@ from rest_framework.authtoken.views import obtain_auth_token
 from app import views
 
 router = routers.DefaultRouter()
-router.register(r"register", views.RegisterAPI, "register")
-router.register(r"logout", views.LogoutView, "logout")
-
+router.register(r"user", views.UserViewSet, "user")
+router.register(r"book", views.BooksViewSet, "book")
+router.register(r"review", views.ReviewsViewSet, "review")
 
 
 urlpatterns = [
     path("login/", obtain_auth_token, name="api_token_auth"),
-    path(
-        r"^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$",
-        views.activate,
-        name="activate",
-    ),
     path("", include(router.urls)),
 ]

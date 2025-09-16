@@ -22,3 +22,18 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "password",
         ]
+
+
+
+class BookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Book
+        fields = "__all__"
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    book = BookSerializer(read_only=True)
+
+    class Meta:
+        model = models.Review
+        exclude = ["user"]

@@ -95,8 +95,8 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Boogeat",
-    "DESCRIPTION": "Boogeat API",
+    "TITLE": "Duseca Test",
+    "DESCRIPTION": "Duseca Test API",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
