@@ -163,3 +163,39 @@ python manage.py flush
 # Add fake data to database
 python manage.py populate
 ```
+
+
+### Schema Design Decisions
+
+
+User
+
+1. Custom user model using email as USERNAME_FIELD for login.
+
+2. email is unique and required, name is optional.
+
+3. Decision: Use email login instead of username for modern authentication practices.
+
+Book
+
+1. Stores title, author, published_date, isbn.
+
+2. isbn is unique to prevent duplicates.
+
+3. Decision: Keep core book metadata, enforce uniqueness on ISBN for integrity.
+
+Review
+
+1. Relates User ↔ Book via ForeignKey.
+
+2. related_name set for easy reverse querying (book_reviews, user_reviews).
+
+3. rating is constrained between 1–5 with choices for clarity.
+
+4. unique_together ensures one review per user per book.
+
+5. Decision: Maintain data integrity, enforce business rules at schema level.
+
+
+### Schema Design image 
+it is location in roat directory
